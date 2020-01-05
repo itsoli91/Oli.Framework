@@ -6,8 +6,8 @@ namespace Oli.Framework.Core.Exceptions
 {
     public enum ExceptionTypeCodes
     {
-        DomainException = 100,
-        ApplicationException = 200,
-        PresentationException = 300
+        DomainException = -100,
+        ApplicationException = -200,
+        PresentationException = -300
     }
 }

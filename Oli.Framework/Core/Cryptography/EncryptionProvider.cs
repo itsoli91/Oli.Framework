@@ -7,67 +7,121 @@ namespace Oli.Framework.Core.Cryptography
 {
     public class EncryptionProvider : IEncryption
     {
-        public string Aes256Encryption(string plainText, string encryptionKey, string initializationVector)
+        public byte[] BaseAesEncrypt(string plainText, string encryptionKey, int keySize = 256,
+            string initializationVector = "")
         {
-            byte[] encryptedBytes;
+            byte[] encrypted;
 
-
-            var bytesToBeEncrypted =
-                Convert.FromBase64String(Convert.ToBase64String(Encoding.UTF8.GetBytes(plainText)));
-            var passwordBytes = Convert.FromBase64String(encryptionKey);
-            var saltBytes = Convert.FromBase64String(initializationVector);
-
-            using (var ms = new MemoryStream())
+            // Create an AesManaged object
+            // with the specified key and IV.
+            using (var aesAlg = new AesManaged())
             {
-                using var aes = new RijndaelManaged();
-                var key = new Rfc2898DeriveBytes(passwordBytes, saltBytes, 1000);
-                aes.KeySize = 256;
-                aes.BlockSize = 128;
-                aes.Key = key.GetBytes(aes.KeySize / 8);
-                aes.IV = key.GetBytes(aes.BlockSize / 8);
-                aes.Mode = CipherMode.CBC;
+                aesAlg.KeySize = keySize;
+                aesAlg.Key = Encoding.UTF8.GetBytes(encryptionKey);
+                aesAlg.IV = Encoding.UTF8.GetBytes(initializationVector);
 
-                using (var cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                // Create an encryptor to perform the stream transform.
+                var encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                // Create the streams used for encryption.
+                using var msEncrypt = new MemoryStream();
+                using var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write);
+                using (var swEncrypt = new StreamWriter(csEncrypt))
                 {
-                    cs.Write(bytesToBeEncrypted, 0, bytesToBeEncrypted.Length);
-                    cs.Close();
+                    //Write all data to the stream.
+                    swEncrypt.Write(plainText);
                 }
 
-                encryptedBytes = ms.ToArray();
+                encrypted = msEncrypt.ToArray();
             }
+
+
+            // Return the encrypted bytes from the memory stream.
+            return encrypted;
+        }
+
+        public string AesEncrypt(string plainText, string encryptionKey, int keySize = 256,
+            string initializationVector = "")
+        {
+            var encryptedBytes = BaseAesEncrypt(plainText, encryptionKey, keySize, initializationVector);
 
             return Convert.ToBase64String(encryptedBytes);
         }
 
-        public string Aes256FileEncryption(string fileName, string encryptionKey, string initializationVector)
+
+        public byte[] BaseAesFileEncrypt(string fileName, string encryptionKey, int keySize = 256,
+            string initializationVector = "")
         {
-            byte[] encryptedBytes;
+            byte[] encrypted;
 
-
-            var bytesToBeEncrypted = File.ReadAllBytes(fileName);
-            var passwordBytes = Convert.FromBase64String(encryptionKey);
-            var saltBytes = Convert.FromBase64String(initializationVector);
-
-            using (var ms = new MemoryStream())
+            // Create an AesManaged object
+            // with the specified key and IV.
+            using (var aesAlg = new AesManaged())
             {
-                using var aes = new RijndaelManaged();
-                var key = new Rfc2898DeriveBytes(passwordBytes, saltBytes, 1000);
-                aes.KeySize = 256;
-                aes.BlockSize = 128;
-                aes.Key = key.GetBytes(aes.KeySize / 8);
-                aes.IV = key.GetBytes(aes.BlockSize / 8);
-                aes.Mode = CipherMode.CBC;
+                aesAlg.KeySize = keySize;
+                aesAlg.Key = Encoding.UTF8.GetBytes(encryptionKey);
+                aesAlg.IV = Encoding.UTF8.GetBytes(initializationVector);
 
-                using (var cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                // Create an encryptor to perform the stream transform.
+                var encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                // Create the streams used for encryption.
+                using var msEncrypt = new MemoryStream();
+                using var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write);
+                using (var swEncrypt = new StreamWriter(csEncrypt))
                 {
-                    cs.Write(bytesToBeEncrypted, 0, bytesToBeEncrypted.Length);
-                    cs.Close();
+                    //Write all data to the stream.
+                    swEncrypt.Write(File.ReadAllBytes(fileName));
                 }
 
-                encryptedBytes = ms.ToArray();
+                encrypted = msEncrypt.ToArray();
             }
+
+
+            // Return the encrypted bytes from the memory stream.
+            return encrypted;
+        }
+
+
+        public string AesFileEncrypt(string fileName, string encryptionKey, int keySize = 256,
+            string initializationVector = "")
+        {
+            var encryptedBytes = BaseAesFileEncrypt(fileName, encryptionKey, keySize, initializationVector);
 
             return Convert.ToBase64String(encryptedBytes);
         }
+
+
+
+        public string AesDecrypt(string cipherText, string encryptionKey, int keySize = 256,
+            string initializationVector = "")
+        {
+            // Declare the string used to hold
+            // the decrypted text.
+            string plaintext;
+
+            // Create an AesManaged object
+            // with the specified key and IV.
+            using (var aesAlg = new AesManaged())
+            {
+                aesAlg.Key = Encoding.UTF8.GetBytes(encryptionKey);
+                aesAlg.IV = Encoding.UTF8.GetBytes(initializationVector);
+
+                // Create a decryptor to perform the stream transform.
+                var decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+                // Create the streams used for decryption.
+                using var msDecrypt = new MemoryStream(Convert.FromBase64String(cipherText));
+                using var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read);
+                using var srDecrypt = new StreamReader(csDecrypt);
+                // Read the decrypted bytes from the decrypting stream
+                // and place them in a string.
+                plaintext = srDecrypt.ReadToEnd();
+            }
+
+            return plaintext;
+        }
+
+
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -8,136 +7,49 @@ namespace Oli.Framework.Core.Cryptography
 {
     public class HashProvider : IHashProvider
     {
-        public string Sha256Hash(string rawData, string salt = "")
+        public byte[] BaseHash(HashAlgorithms hashAlgorithms, string rawData, string salt = "")
         {
-            // Create a SHA256   
-            using var sha256Hash = SHA256.Create();
-            // ComputeHash - returns byte array  
-
+            using var algorithms = HashAlgorithm.Create(hashAlgorithms.ToString());
             var input = string.IsNullOrEmpty(salt)
                 ? Encoding.UTF8.GetBytes(rawData)
                 : Encoding.UTF8.GetBytes(rawData + salt);
+            return algorithms?.ComputeHash(input);
 
 
-            var bytes = sha256Hash.ComputeHash(input);
-
-            // Convert byte array to a string   
-            var builder = new StringBuilder();
-            foreach (var b in bytes)
-            {
-                builder.Append(b.ToString("x2"));
-            }
-
-
-            return builder.ToString();
+            
         }
 
-        public string Sha512Hash(string rawData, string salt = "")
+        public byte[] BaseHashFile(HashAlgorithms hashAlgorithms, string fileName, string salt = "")
         {
-            // Create a SHA512   
-            using var sha512Hash = SHA512.Create();
-            // ComputeHash - returns byte array  
-
-            var input = string.IsNullOrEmpty(salt)
-                ? Encoding.UTF8.GetBytes(rawData)
-                : Encoding.UTF8.GetBytes(rawData + salt);
-
-
-            var bytes = sha512Hash.ComputeHash(input);
-
-            // Convert byte array to a string   
-            var builder = new StringBuilder();
-            foreach (var b in bytes)
-            {
-                builder.Append(b.ToString("x2"));
-            }
-
-            return builder.ToString();
-        }
-
-        public string Md5Hash(string rawData, string salt = "")
-        {
-            // Create a Md5  
-            using var md5Hash = MD5.Create();
-            // ComputeHash - returns byte array  
-
-            var input = string.IsNullOrEmpty(salt)
-                ? Encoding.UTF8.GetBytes(rawData)
-                : Encoding.UTF8.GetBytes(rawData + salt);
-
-
-            var bytes = md5Hash.ComputeHash(input);
-
-            // Convert byte array to a string   
-            var builder = new StringBuilder();
-            foreach (var b in bytes)
-            {
-                builder.Append(b.ToString("x2"));
-            }
-
-            return builder.ToString();
-        }
-
-        public string Sha256FileHash(string fileName, string salt = "")
-        {
-            // Create a SHA256   
-            using var sha256Hash = SHA256.Create();
-            // ComputeHash - returns byte array  
+            using var algorithm = HashAlgorithm.Create(hashAlgorithms.ToString());
 
             var fileBytes = File.ReadAllBytes(fileName);
             var saltBytes = Encoding.UTF8.GetBytes(salt);
 
             var input = AddByteToArray(fileBytes, saltBytes);
 
-            var bytes = sha256Hash.ComputeHash(input);
-
-            // Convert byte array to a string   
-            var builder = new StringBuilder();
-            foreach (var b in bytes)
-            {
-                builder.Append(b.ToString("x2"));
-            }
-
-            return builder.ToString();
+            return algorithm?.ComputeHash(input);
         }
 
-        public string Sha512FileHash(string fileName, string salt = "")
+        public string Hash(HashAlgorithms hashAlgorithms, string rawData, string salt = "")
         {
-            // Create a SHA512
-            using var sha512Hash = SHA512.Create();
-            // ComputeHash - returns byte array  
+            var bytes = BaseHash(hashAlgorithms, rawData, salt);
 
-            var fileBytes = File.ReadAllBytes(fileName);
-            var saltBytes = Encoding.UTF8.GetBytes(salt);
 
-            var input = AddByteToArray(fileBytes, saltBytes);
-
-            var bytes = sha512Hash.ComputeHash(input);
-
-            // Convert byte array to a string   
             var builder = new StringBuilder();
             foreach (var b in bytes)
             {
                 builder.Append(b.ToString("x2"));
             }
 
+
             return builder.ToString();
         }
 
-        public string Md5FileHash(string fileName, string salt = "")
+        public string HashFile(HashAlgorithms hashAlgorithms, string fileName, string salt = "")
         {
-            // Create a SHA512
-            using var shaMd5Hash = MD5.Create();
-            // ComputeHash - returns byte array  
+            var bytes = BaseHashFile(hashAlgorithms, fileName, salt);
 
-            var fileBytes = File.ReadAllBytes(fileName);
-            var saltBytes = Encoding.UTF8.GetBytes(salt);
-
-            var input = AddByteToArray(fileBytes, saltBytes);
-
-            var bytes = shaMd5Hash.ComputeHash(input);
-
-            // Convert byte array to a string   
             var builder = new StringBuilder();
             foreach (var b in bytes)
             {
@@ -146,7 +58,6 @@ namespace Oli.Framework.Core.Cryptography
 
             return builder.ToString();
         }
-
 
         private static byte[] AddByteToArray(byte[] first, byte[] second)
         {

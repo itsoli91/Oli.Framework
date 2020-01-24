@@ -1,12 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Oli.Framework.Core.Cryptography
+﻿namespace Oli.Framework.Core.Cryptography
 {
     public interface IEncryption
     {
-        string Aes256Encryption(string plainText, string encryptionKey, string initializationVector);
-        string Aes256FileEncryption(string fileName, string encryptionKey, string initializationVector);
+        byte[] BaseAesEncrypt(string plainText, string encryptionKey, int keySize = 256,
+            string initializationVector = "");
+
+        byte[] BaseAesFileEncrypt(string fileName, string encryptionKey, int keySize = 256,
+            string initializationVector = "");
+
+        string AesEncrypt(string plainText, string encryptionKey, int keySize = 256, string initializationVector = "");
+
+        string AesFileEncrypt(string fileName, string encryptionKey, int keySize = 256,
+            string initializationVector = "");
+
+
+        string AesDecrypt(string cipherText, string encryptionKey, int keySize = 256, string initializationVector = "");
     }
 }

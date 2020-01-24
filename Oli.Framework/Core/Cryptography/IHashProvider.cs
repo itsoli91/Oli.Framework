@@ -1,12 +1,13 @@
-﻿namespace Oli.Framework.Core.Cryptography
+﻿using System;
+using System.Security.Cryptography;
+
+namespace Oli.Framework.Core.Cryptography
 {
     public interface IHashProvider
     {
-        string Sha256Hash(string rawData, string salt = "");
-        string Sha512Hash(string rawData, string salt = "");
-        string Md5Hash(string rawData, string salt = "");
-        string Sha256FileHash(string fileName, string salt = "");
-        string Sha512FileHash(string fileName, string salt = "");
-        string Md5FileHash(string fileName, string salt = "");
+        byte[] BaseHash(HashAlgorithms hashAlgorithms, string rawData, string salt = "");
+        byte[] BaseHashFile(HashAlgorithms hashAlgorithms, string fileName, string salt = "");
+        string Hash(HashAlgorithms hashAlgorithms, string rawData, string salt = "");
+        string HashFile(HashAlgorithms hashAlgorithms, string fileName, string salt = "");
     }
 }

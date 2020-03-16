@@ -16,7 +16,6 @@ namespace Oli.Framework.Domain
         TEntity GetBySequentialId(long id);
 
         void Remove(TEntity entity);
-        void HardRemove(TEntity entity);
         void RemoveById(Guid id);
         void RemoveBySequentialId(long id);
     }

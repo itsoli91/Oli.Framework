@@ -7,7 +7,7 @@ using Oli.Framework.Domain;
 
 namespace Oli.Framework.DataProvider.EntityFramework
 {
-    public abstract class RepositoryBase<TEntity> : Disposable, IRepository<TEntity> where TEntity : Entity, new()
+    public abstract class RepositoryBase<TEntity, TKey> : Disposable, IRepository<TEntity, TKey> where TEntity : Entity<TKey>, new()
     {
         private readonly IUnitOfWork<IContext> _unitOfWork;
 
@@ -36,7 +36,7 @@ namespace Oli.Framework.DataProvider.EntityFramework
             return query;
         }
 
-        public virtual TEntity GetById(Guid id)
+        public virtual TEntity GetById(TKey id)
         {
             return ObjectSet.Find(id);
         }
@@ -46,7 +46,7 @@ namespace Oli.Framework.DataProvider.EntityFramework
             ObjectSet.Remove(entity);
         }
 
-        public virtual void RemoveById(Guid id)
+        public virtual void RemoveById(TKey id)
         {
             var entity = GetById(id);
             Remove(entity);
@@ -56,16 +56,8 @@ namespace Oli.Framework.DataProvider.EntityFramework
         {
             _unitOfWork?.Dispose();
         }
+    
 
-        public TEntity GetBySequentialId(long id)
-        {
-            return ObjectSet.FirstOrDefault(e => e.SequentialId == id);
-        }
-
-        public void RemoveBySequentialId(long id)
-        {
-            var entity = GetBySequentialId(id);
-            Remove(entity);
-        }
+     
     }
 }

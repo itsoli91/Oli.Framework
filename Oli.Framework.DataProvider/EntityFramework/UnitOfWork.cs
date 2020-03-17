@@ -19,7 +19,7 @@ namespace Oli.Framework.DataProvider.EntityFramework
             Context.Dispose();
         }
 
-        public void ChangeEntityState<TEntity>(TEntity entity, EntityState entityState) where TEntity : class, IEntity
+        public void ChangeEntityState<TEntity, TKey>(TEntity entity, EntityState entityState) where TEntity : class, IEntity<TKey>
         {
             switch (entityState)
             {
@@ -53,7 +53,7 @@ namespace Oli.Framework.DataProvider.EntityFramework
             Context.SaveChanges();
         }
 
-        public IEntityConfiguration GetEntityConfiguration<TEntity>() where TEntity : IEntity
+        public IEntityConfiguration GetEntityConfiguration<TEntity, TKey>() where TEntity : IEntity<TKey>
         {
             throw new NotImplementedException();
         }

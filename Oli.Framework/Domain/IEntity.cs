@@ -2,10 +2,9 @@
 
 namespace Oli.Framework.Domain
 {
-    public interface IEntity
+    public interface IEntity<out TKey>
     {
-        Guid Id { get; }
-        long SequentialId { get; }
+        TKey Id { get; }
         DateTime CreationUtcTime { get; }
         DateTime CreationLocalTime { get; }
 

@@ -4,9 +4,9 @@ namespace Oli.Framework.Domain
 {
     public interface IUnitOfWork<out TContext> : IDisposable
     {
-        void ChangeEntityState<TEntity>(TEntity entity, EntityState entityState) where TEntity : class, IEntity;
+        void ChangeEntityState<TEntity, TKey>(TEntity entity, EntityState entityState) where TEntity : class, IEntity<TKey>;
         void Commit();
-        IEntityConfiguration GetEntityConfiguration<TEntity>() where TEntity : IEntity;
+        IEntityConfiguration GetEntityConfiguration<TEntity, TKey>() where TEntity : IEntity<TKey>;
         TContext GetContext();
     }
 }

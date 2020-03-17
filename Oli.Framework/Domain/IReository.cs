@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace Oli.Framework.Domain
 {
-    public interface IRepository<TEntity> : IDisposable where TEntity : class, IEntity
+    public interface IRepository<TEntity, in TKey> : IDisposable where TEntity : class, IEntity<TKey>
     {
         void Add(TEntity entity);
 
@@ -12,11 +12,8 @@ namespace Oli.Framework.Domain
 
         IQueryable<TEntity> GetAll(Expression<Func<TEntity, bool>> where = null);
 
-        TEntity GetById(Guid id);
-        TEntity GetBySequentialId(long id);
-
+        TEntity GetById(TKey id);
         void Remove(TEntity entity);
-        void RemoveById(Guid id);
-        void RemoveBySequentialId(long id);
+        void RemoveById(TKey id);
     }
 }

@@ -9,12 +9,7 @@ namespace Oli.Framework.DataProvider.EntityFramework
         {
         }
 
-        public void ExecuteSqlRaw(string query, params object[] parameters)
-        {
-            Database.ExecuteSqlRaw(query, parameters);
-        }
-
-        public new DbSet<TEntity> Set<TEntity>() where TEntity : class
+       public new DbSet<TEntity> Set<TEntity>() where TEntity : class
         {
             return base.Set<TEntity>();
         }
